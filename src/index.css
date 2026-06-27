@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@import "tailwindcss";
+
+@theme {
+  /* Font Family definitions */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Space Grotesk', sans-serif;
+  
+  /* Indian Civic - Materials & Stationery Color Palette */
+  --color-postbox-red: #B3211E;     /* Indian postbox / RTI stamp ink — primary action, alerts */
+  --color-ledger-blue: #1F3A5F;      /* faded municipal ledger ink — headers, primary text */
+  --color-ward-yellow: #E8B33D;      /* reflective ward-board yellow — pending/in-progress */
+  --color-notice-buff: #F2EBDA;      /* aged government form paper — page background */
+  --color-register-green: #3F6B4E;   /* old register-book green — resolved/verified */
+  --color-paper-white: #FFFBF4;      /* fresh form paper — cards, surfaces */
+  
+  /* Legacy mapping support for existing code */
+  --color-ns-dark: #1F3A5F;
+  --color-ns-orange: #B3211E;
+  --color-ns-teal: #3F6B4E;
+  --color-ns-green: #3F6B4E;
+  --color-ns-yellow: #E8B33D;
+  --color-ns-red: #B3211E;
+  --color-ns-bg: #F2EBDA;
+  --color-ns-card: #FFFBF4;
+  --color-ns-border: rgba(31, 58, 149, 0.15);
+  --color-ns-text-1: #1F3A5F;
+  --color-ns-text-2: #3F6B4E;
+  --color-ns-text-3: #1F3A5F;
+
+  /* Corner Radius - paper has corners! */
+  --radius-xs: 1px;
+  --radius-sm-custom: 2px;
+  --radius-md-custom: 2px;
+  --radius-lg-custom: 2px;
+  --radius-xl-custom: 2px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes scroll-ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes stamp-slam {
+  0% {
+    transform: scale(3.5) rotate(-22deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(0.95) rotate(-5deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) rotate(-3deg);
+    opacity: 1;
+  }
+}
+
+/* Custom Utilities Helper */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #F2EBDA 25%, #FFFBF4 50%, #F2EBDA 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-floating {
+  animation: floating 4s ease-in-out infinite;
+}
+
+.animate-ticker {
+  animation: scroll-ticker 35s linear infinite;
+}
+
+/* Official Rubber Ink Stamps */
+.stamp-seal {
+  display: inline-block;
+  padding: 4px 10px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transform: rotate(-3deg);
+  line-height: 1;
+  border-radius: 2px;
+  mix-blend-mode: multiply;
+  align-self: center;
+  position: relative;
+  user-select: none;
+  animation: stamp-slam 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
+
+.stamp-seal::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0.15;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.5) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+}
+
+.stamp-red {
+  color: #B3211E;
+  border: 2.5px solid #B3211E;
+  background-color: rgba(179, 33, 30, 0.03);
+}
+
+.stamp-yellow {
+  color: #D39215;
+  border: 2px dashed #D39215;
+  background-color: rgba(211, 146, 21, 0.02);
+}
+
+.stamp-green {
+  color: #2F593E;
+  border: 3px double #2F593E;
+  background-color: rgba(47, 89, 62, 0.03);
+}
+
+/* Tactical layout decorations */
+body {
+  font-family: 'Mukta', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  background-color: #F2EBDA; /* Aged municipal paper background */
+  color: #1F3A5F; /* Ledger ink dark text */
+}
+
+/* Carbon copy paper overlay effect */
+.carbon-copy-bg {
+  background-color: #FFFBF4;
+  border: 1px solid rgba(31, 58, 95, 0.18);
+  box-shadow: 1px 1px 0 rgba(31, 58, 95, 0.1);
+}
+
+.card-shadow {
+  box-shadow: 2px 2px 0 rgba(31, 58, 95, 0.15);
+  transition: all 0.18s ease;
+}
+
+.card-shadow:hover {
+  box-shadow: 3px 3px 0 rgba(31, 58, 95, 0.25);
+  transform: translateY(-0.5px);
+}
+
+.severity-fill {
+  background: linear-gradient(to right, #3F6B4E 0%, #E8B33D 60%, #B3211E 100%);
+}
+
+

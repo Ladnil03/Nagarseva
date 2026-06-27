@@ -1,0 +1,6 @@
+{
+  "name": "NagarSeva",
+  "description": "Civic issue reporting, AI validation, and community resolution platform for Indian citizens with transparent authority accountability.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
