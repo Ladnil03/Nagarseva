@@ -96,7 +96,7 @@ export default function LoginPage({ onBack, onSuccess }: LoginPageProps) {
           )}
 
           {/* Toggle Role (citizen / authority) */}
-          <div className="grid grid-cols-2 gap-2 border-b border-slate-200 pb-3">
+          <div className="grid grid-cols-2 gap-2 border-b border-slate-200 pb-1">
             <button
               type="button"
               onClick={() => setRole('citizen')}
@@ -119,6 +119,41 @@ export default function LoginPage({ onBack, onSuccess }: LoginPageProps) {
             >
               Officer Desk
             </button>
+          </div>
+
+          {/* Demo Accounts Quick Fill */}
+          <div className="bg-[#E8B33D]/10 border border-[#E8B33D]/30 p-3 rounded-[2px] space-y-1.5">
+            <span className="block text-[9px] font-mono font-bold text-[#1F3A5F] uppercase tracking-wider">
+              ⚡ DEMO ACCESS LEDGERS (TEST ACCOUNTS)
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setRole('citizen');
+                  setIsSignUp(false);
+                  setEmail('citizen@nagarseva.org');
+                  setPassword('citizen123');
+                }}
+                className="bg-white border border-[#B3211E]/20 text-[#B3211E] hover:border-[#B3211E]/50 text-[10px] font-bold py-1.5 px-2 rounded hover:bg-[#B3211E]/5 transition-all uppercase font-mono text-left cursor-pointer flex items-center justify-between"
+              >
+                <span>👤 Citizen Demo</span>
+                <span className="text-[8px] opacity-60">FILL</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setRole('authority');
+                  setIsSignUp(false);
+                  setEmail('officer@nagarseva.gov.in');
+                  setPassword('officer123');
+                }}
+                className="bg-white border border-[#1F3A5F]/20 text-[#1F3A5F] hover:border-[#1F3A5F]/50 text-[10px] font-bold py-1.5 px-2 rounded hover:bg-[#1F3A5F]/5 transition-all uppercase font-mono text-left cursor-pointer flex items-center justify-between"
+              >
+                <span>👮 Officer Demo</span>
+                <span className="text-[8px] opacity-60">FILL</span>
+              </button>
+            </div>
           </div>
 
           {isSignUp && (

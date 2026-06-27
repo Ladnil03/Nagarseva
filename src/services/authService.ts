@@ -69,17 +69,20 @@ export async function signUpUser(
     const uid = userCredential.user.uid;
     
     const userDocRef = doc(db, "users", uid);
+    
+    // Check if it's the demo citizen to populate rich stats
+    const isCitizenDemo = email.toLowerCase().trim() === 'citizen@nagarseva.org';
     const initialProfile = {
       uid,
       name,
       email,
       role,
       wardName,
-      points: role === 'citizen' ? 100 : 0, // 100 bonus starting points for citizens
-      level: "1",
-      resolvedCount: 0,
-      reportedCount: 0,
-      verificationsCount: 0,
+      points: isCitizenDemo ? 380 : (role === 'citizen' ? 100 : 0),
+      level: isCitizenDemo ? "3" : "1",
+      resolvedCount: isCitizenDemo ? 2 : 0,
+      reportedCount: isCitizenDemo ? 4 : 0,
+      verificationsCount: isCitizenDemo ? 8 : 0,
       createdAt: new Date().toISOString()
     };
     
@@ -108,6 +111,7 @@ export async function signUpUser(
 
 /**
  * Signs in an existing user with email credentials.
+ * Includes graceful auto-creation for demo accounts if not yet registered in Firebase.
  * @param {string} email User email
  * @param {string} password User password
  * @returns {Promise<UserProfile>} Retrieved user profile
@@ -117,18 +121,63 @@ export async function signInUser(email: string, password: string): Promise<UserP
     const auth = getFirebaseAuth();
     const db = getFirebaseFirestore();
     
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
-    
-    const userDocRef = doc(db, "users", uid);
-    const userDoc = await getDoc(userDocRef);
-    
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      localStorage.setItem(LOCAL_UID_KEY, uid);
-      return normalizeProfile(data);
-    } else {
-      throw new Error("No database profile associated with this account.");
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        localStorage.setItem(LOCAL_UID_KEY, uid);
+        return normalizeProfile(data);
+      } else {
+        // Create Firestore profile if it doesn't exist for some reason
+        const role = email.toLowerCase().includes('officer') ? 'authority' : 'citizen';
+        const name = email.toLowerCase().includes('officer') ? 'Officer Vikram Gowda' : 'Rohan Sharma';
+        const isCitizen = role === 'citizen';
+        const initialProfile = {
+          uid,
+          name,
+          email,
+          role,
+          wardName: "HAL 2nd Stage Ward 142",
+          points: isCitizen ? 380 : 0,
+          level: isCitizen ? "3" : "1",
+          resolvedCount: isCitizen ? 2 : 0,
+          reportedCount: isCitizen ? 4 : 0,
+          verificationsCount: isCitizen ? 8 : 0,
+          createdAt: new Date().toISOString()
+        };
+        await setDoc(userDocRef, initialProfile);
+        localStorage.setItem(LOCAL_UID_KEY, uid);
+        return normalizeProfile(initialProfile);
+      }
+    } catch (err: any) {
+      // If it's a demo account and failed (e.g. invalid credentials because it doesn't exist),
+      // we auto-create the credential on the fly so it works seamlessly!
+      const lowerEmail = email.toLowerCase().trim();
+      const isCitizenDemo = lowerEmail === 'citizen@nagarseva.org' && password === 'citizen123';
+      const isOfficerDemo = lowerEmail === 'officer@nagarseva.gov.in' && password === 'officer123';
+      
+      if (isCitizenDemo || isOfficerDemo) {
+        try {
+          const role = isOfficerDemo ? 'authority' : 'citizen';
+          const name = isOfficerDemo ? 'Officer Vikram Gowda' : 'Rohan Sharma';
+          return await signUpUser(
+            email,
+            password,
+            name,
+            "HAL 2nd Stage Ward 142",
+            role
+          );
+        } catch (signUpErr) {
+          console.error("Graceful registration of demo credentials failed:", signUpErr);
+          throw err;
+        }
+      }
+      throw err;
     }
   } else {
     // Local storage fallback login
